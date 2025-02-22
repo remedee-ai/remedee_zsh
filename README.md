@@ -1,4 +1,4 @@
-<h1 align="center">⌨️ 🦾 Zsh Codex</h1>
+<h1 align="center">⌨️ 🦾Remedee for  Zsx</h1>
 
 <p align="center">
     AI in the command line.

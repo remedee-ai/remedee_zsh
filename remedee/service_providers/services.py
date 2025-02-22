@@ -2,9 +2,11 @@ import os
 import sys
 from abc import ABC, abstractmethod
 from configparser import ConfigParser
+from remedee.common.utils.keychain import get_env
+import logging
 
 CONFIG_DIR = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
-CONFIG_PATH = os.path.join(CONFIG_DIR, "zsh_codex.ini")
+CONFIG_PATH = os.path.join(CONFIG_DIR, "remedee/remedee_zsh.ini")
 
 
 class BaseClient(ABC):
@@ -43,22 +45,32 @@ class OpenAIClient(BaseClient):
 
         self.config = config
         self.config["model"] = self.config.get("model", self.default_model)
+        api_key = get_env("OPENAI_API_KEY", 'open-ai-api', 'asr')
         self.client = OpenAI(
-            api_key=self.config["api_key"],
+            api_key=api_key,
             base_url=self.config.get("base_url", "https://api.openai.com/v1"),
             organization=self.config.get("organization"),
         )
 
     def get_completion(self, full_command: str) -> str:
+        return self.request(self.system_prompt, full_command)
+    
+    def request(self, system_prompt: str, user_prompt: str, history=[]) -> str:
+        messages = [{"role": "system", "content": system_prompt}] 
+        messages +=  history
+        messages += [{"role": "user", "content": user_prompt}]
+
+        for message in messages:
+            logging.debug(f"{message['role']}: {message['content']}")
+            
         response = self.client.chat.completions.create(
             model=self.config["model"],
-            messages=[
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": full_command},
-            ],
-            temperature=float(self.config.get("temperature", 1.0)),
+            messages=messages,
+            temperature=float(self.config.get("temperature", 0.5)),
         )
-        return response.choices[0].message.content
+        res = response.choices[0].message.content
+        history.append({"role": "assistant", "content": res})
+        return res
 
 
 class GoogleGenAIClient(BaseClient):

@@ -1,0 +1,38 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "completion",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "create_completion.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "13"
+            ]
+        },
+        {
+            "name": "query",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "answer_query.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--debug",
+                // --prompt="Look at the last command output above and analyze the issue."
+            ]
+        },
+    ]
+}
